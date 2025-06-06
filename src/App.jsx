@@ -5,7 +5,6 @@ import About from './components/About';
 import Skill from './components/Skills';
 import Work from './components/Work';
 import Contact from './components/Contact';
-import ReactLenis from 'lenis/react';
 import Footer from './components/Footer'
 
 
@@ -13,8 +12,8 @@ const App = () => {
 
 
   return (
-    <ReactLenis root>
-      <Header />
+    <>
+    <Header />
       <main>
         <Hero />
         <About />
@@ -23,7 +22,9 @@ const App = () => {
         <Contact />
         <Footer/>
       </main>
-    </ReactLenis>
+    </>
+      
+    
   );
 };
 
