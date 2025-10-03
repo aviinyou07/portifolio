@@ -1,63 +1,91 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-const Navbar = ({ navOpen }) => {
-    const lastActiveLink = useRef();
-    const activeBox = useRef();
+const Navbar = ({ navOpen, setNavOpen }) => {
+  const lastActiveLink = useRef();
+  const activeBox = useRef();
+  const navRef = useRef();
+  const [boxStyle, setBoxStyle] = useState({ top: 0, left: 0, width: 0, height: 0 });
 
-    const initActiveBox = () => {
-        if (lastActiveLink.current) {
-            activeBox.current.style.top = lastActiveLink.current.offsetTop + 'px';
-            activeBox.current.style.left = lastActiveLink.current.offsetLeft + 'px';
-            activeBox.current.style.width = lastActiveLink.current.offsetWidth + 'px';
-            activeBox.current.style.height = lastActiveLink.current.offsetHeight + 'px';
-        }
+  const updateActiveBox = (target) => {
+    if (!target) return;
+
+    const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = target;
+
+    // Update box state to trigger smooth transition
+    setBoxStyle({ top: offsetTop, left: offsetLeft, width: offsetWidth, height: offsetHeight });
+  };
+
+  useEffect(() => {
+    // Initialize box position
+    updateActiveBox(lastActiveLink.current);
+
+    const handleResize = () => updateActiveBox(lastActiveLink.current);
+    const handleClickOutside = (e) => {
+      if (navRef.current && !navRef.current.contains(e.target)) setNavOpen(false);
     };
 
-    useEffect(initActiveBox, []);
-    window.addEventListener('resize', initActiveBox);
+    window.addEventListener('resize', handleResize);
+    document.addEventListener('mousedown', handleClickOutside);
 
-    const activeCurrentLink = (event) => {
-        lastActiveLink.current?.classList.remove('active');
-        event.target.classList.add('active');
-        lastActiveLink.current = event.target;
-
-        activeBox.current.style.top = event.target.offsetTop + 'px';
-        activeBox.current.style.left = event.target.offsetLeft + 'px';
-        activeBox.current.style.width = event.target.offsetWidth + 'px';
-        activeBox.current.style.height = event.target.offsetHeight + 'px';
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
+  }, [setNavOpen]);
 
-    const navItems = [
-        { label: 'Home', link: '/', className: 'nav-link active' },
-        { label: 'About', link: '#About', className: 'nav-link' },
-        { label: 'Skills', link: '#Skills', className: 'nav-link' },
-        { label: 'Work', link: '#Work', className: 'nav-link' },
-        { label: 'Contact', link: '#Contact', className: 'nav-link md:hidden' }
-    ];
+  const handleLinkClick = (e) => {
+    lastActiveLink.current?.classList.remove('active');
+    e.target.classList.add('active');
+    lastActiveLink.current = e.target;
 
-    return (
-        <nav className={'navbar ' + (navOpen ? 'active' : '')}>
-            {
-                navItems.map(({ label, link, className }, key) => (
-                    <a
-                        href={link}
-                        key={key}
-                        ref={key === 0 ? lastActiveLink : null}
-                        className={className}
-                        onClick={activeCurrentLink}
-                    >
-                        {label}
-                    </a>
-                ))
-            }
-            <div className='active-Box' ref={activeBox}></div>
-        </nav>
-    );
+    updateActiveBox(e.target);
+    setNavOpen(false);
+  };
+
+  const navItems = [
+    { label: 'Home', link: '/', className: 'nav-link active' },
+    { label: 'About', link: '#About', className: 'nav-link' },
+    { label: 'Skills', link: '#Skills', className: 'nav-link' },
+    { label: 'Work', link: '#Work', className: 'nav-link' },
+    { label: 'Contact', link: '#Contact', className: 'nav-link md:hidden' },
+  ];
+
+  return (
+    <nav ref={navRef} className={`navbar ${navOpen ? 'active' : ''}`}>
+      {navItems.map(({ label, link, className }, index) => (
+        <a
+          key={index}
+          href={link}
+          ref={index === 0 ? lastActiveLink : null}
+          className={className}
+          onClick={handleLinkClick}
+        >
+          {label}
+        </a>
+      ))}
+
+      <div
+        ref={activeBox}
+        className="active-Box"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: `${boxStyle.width}px`,
+          height: `${boxStyle.height}px`,
+          transform: `translate(${boxStyle.left}px, ${boxStyle.top}px)`,
+          transition: 'transform 0.3s ease, width 0.3s ease, height 0.3s ease',
+          pointerEvents: 'none', // ensures box doesn't block clicks
+        }}
+      />
+    </nav>
+  );
 };
 
 Navbar.propTypes = {
-    navOpen: PropTypes.bool.isRequired
+  navOpen: PropTypes.bool.isRequired,
+  setNavOpen: PropTypes.func.isRequired,
 };
 
 export default Navbar;

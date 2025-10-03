@@ -1,46 +1,51 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { lazy } from 'react'
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const WorkCard = (
-    {
-        imgScr,
-        title,
-        tags,
-        projectLink,
-        classes
-    }
-) => {
+const WorkCard = ({ imgSrc, title, tags, projectLink }) => {
   return (
-    <div className={'relative p-4 rounded-2xl bg-zinc-800 hover:bg-zinc-700/50 active:bg-zinc-700/60 ring-1 ring-inset ring-zinc-50/5 transition-colors ' + classes}>
-        <figure className=" img-box aspect-square rounded-lg mb-4">
-            <img src={imgScr} alt={title} loading={lazy} className='img-cover'/>
-        </figure>
-        <div className="flex items-center justify-between gap-4">
-            <div>
-                <h3 className="title-1 mb-3">
-                    {title}
-                </h3>
-                <div className="flex flex-wrap items-center gap-2">
-                    {tags.map((label, key) => (
-                        <span key={key} className="h-8 text-sm text-zinc-400 bg-zinc-50/5 grid items-center px-3 rounded-lg"> {label}</span>
-                    ))}
-                </div>
-            </div>
-            <div className="w-11 h-11 rounded-lg grid place-items-center bg-sky-400 text-zinc-950 shrink-0">
-                <span aria-hidden='true' className=" material-symbols-rounded">
-                    arrow_outward
-                </span>
-            </div>
-            <a href={projectLink} className='absolute inset-0 ' target='blank'></a>
+    <a
+      href={projectLink}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative block rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg mx-auto"
+    >
+      {/* Background Image */}
+      <img
+        src={imgSrc}
+        alt={title}
+        className="w-full h-48 sm:h-56 md:h-64 lg:h-72 xl:h-80 object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
+      />
+
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/40 flex flex-col justify-end p-4 gap-2">
+        <h3 className="text-lg sm:text-sm md:text-lg lg:text-xl font-semibold text-zinc-100">{title}</h3>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 text-xs sm:text-[0.65rem] md:text-xs lg:text-sm">
+          {tags.map((tag, idx) => (
+            <span
+              key={idx}
+              className="font-medium px-2 py-1 rounded-full bg-emerald-400/20 text-emerald-400 transition-transform duration-300 group-hover:scale-105"
+            >
+              {tag}
+            </span>
+          ))}
         </div>
-    </div>
-  )
-}
-WorkCard.propTypes ={
-    imgScr: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    tags: PropTypes.string.isRequired,
-    classes:PropTypes.string
-}
-export default WorkCard
+
+        {/* Action Button */}
+        <span className="inline-block mt-2 text-sm sm:text-xs md:text-sm font-medium text-emerald-400 border border-emerald-400 rounded-full px-3 py-1 hover:bg-emerald-400 hover:text-zinc-900 hover:shadow-md hover:shadow-emerald-400/50 transition-all duration-300">
+          View Project
+        </span>
+      </div>
+    </a>
+  );
+};
+
+WorkCard.propTypes = {
+  imgSrc: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  tags: PropTypes.arrayOf(PropTypes.string).isRequired,
+  projectLink: PropTypes.string.isRequired,
+};
+
+export default WorkCard;

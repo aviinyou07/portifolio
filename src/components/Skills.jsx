@@ -1,88 +1,84 @@
-import React from 'react'
-import SkillCard from './SkillCard'
+import React, { useEffect, useState } from 'react';
+import SkillCard from './SkillCard';
+import { Code, Server, Database, Terminal, Monitor } from 'lucide-react';
 
-const skillItem = [
-  {
-    imgSrc: 'https://www.kindpng.com/picc/m/81-814934_figma-logo-png-transparent-png.png',
-    label: 'Figma',
-    desc: 'Design tool'
-  },
+// Custom GitHub icon as Lucide doesn't provide brand logos
+const GitHubIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.25 3.438 9.69 8.205 11.29.6.111.82-.261.82-.577 0-.286-.01-1.043-.015-2.048-3.338.725-4.04-1.61-4.04-1.61-.546-1.387-1.334-1.756-1.334-1.756-1.09-.745.083-.73.083-.73 1.205.084 1.838 1.238 1.838 1.238 1.07 1.832 2.808 1.302 3.495.997.108-.776.418-1.302.761-1.599-2.665-.303-5.465-1.332-5.465-5.93 0-1.31.468-2.381 1.236-3.22-.124-.303-.536-.91.118-1.89 0 0 1.008-.323 3.3 1.23 1.04-.29 2.16-.433 3.27-.433 1.11 0 2.23.144 3.27.433 2.292-1.553 3.3-1.23 3.3-1.23.654.98.242 1.587.118 1.89.768.839 1.236 1.91 1.236 3.22 0 4.61-2.8 5.625-5.47 5.93.43.37.82 1.1.82 2.22 0 1.6-.015 2.88-.015 3.26 0 .318.22.692.83.577C20.563 21.69 24 17.25 24 12c0-6.63-5.37-12-12-12z" />
+  </svg>
+);
 
-   {
-    imgSrc: 'https://seeklogo.com/images/C/css-logo-FD0B685547-seeklogo.com.png',
-    label: 'CSS',
-    desc: 'User Interface'
-  },
-  {
-    imgSrc: 'https://logos-world.net/wp-content/uploads/2023/02/JavaScript-Symbol.png',
-    label: 'JavaScript',
-    desc: 'Interaction'
-  },
-  {
-    imgSrc: 'https://logodix.com/logo/1764972.png',
-    label: 'NodeJS',
-    desc: 'Web Server'
-  },
-  {
-    imgSrc: 'https://th.bing.com/th/id/OIP.1ji9NLQl3sOXktSoEYnt3wHaHa?rs=1&pid=ImgDetMain',
-    label: 'ExpressJS',
-    desc: 'Node Framework'
-  },
-  {
-    imgSrc: 'https://dbdb.io/media/logos/MongoDB_Logo_FullColor_RGB.png',
-    label: 'MongoDB',
-    desc: 'Database'
-  },
-  {
-    imgSrc: 'https://th.bing.com/th/id/OIP.ShYBuJ8XSwnQ9GhVvjeFhwHaE8?rs=1&pid=ImgDetMain',
-    label: 'React',
-    desc: 'Framework'
-  },
-  {
-    imgSrc: 'https://th.bing.com/th/id/OIP.SeaVJSUCJE1GS3u3Gt3t4QHaEK?rs=1&pid=ImgDetMain',
-    label: 'TailwindCSS',
-    desc: 'User Interface'
-  },
-  {
-    imgSrc:'https://th.bing.com/th/id/R.adbac78231c9a2ff5c21aaa32dd4e1e4?rik=jWTUkOKwKIk7jg&riu=http%3a%2f%2flofrev.net%2fwp-content%2fphotos%2f2017%2f05%2fphp_emblem.png&ehk=gbX0plW%2fbqAeSR4cWmkL44R%2bUWxCpG3CL%2b2V4KHQlpQ%3d&risl=&pid=ImgRaw&r=0',
-    label: 'php',
-    desc: 'Backend'
-  },
-   {
-    imgSrc: 'https://th.bing.com/th/id/OIP.umXj7kc766dOPpjavaBmLQHaEo?rs=1&pid=ImgDetMain',
-    label: 'Java',
-    desc: 'Programming'
-  },
-
-]
+const skillItems = [
+  { Icon: Code, label: 'React', desc: 'Frontend Framework' },
+  { Icon: Code, label: 'Next.js', desc: 'SSR & Static Apps' },
+  { Icon: Code, label: 'Angular', desc: 'Frontend Framework' },
+  { Icon: Monitor, label: 'Tailwind CSS', desc: 'UI Framework' },
+  { Icon: Monitor, label: 'Bootstrap', desc: 'UI Framework' },
+  { Icon: Code, label: 'TypeScript', desc: 'Typed JavaScript' },
+  { Icon: Server, label: 'Node.js', desc: 'Backend Runtime' },
+  { Icon: Server, label: 'Express.js', desc: 'Node Framework' },
+  { Icon: Database, label: 'MongoDB', desc: 'NoSQL Database' },
+  { Icon: Database, label: 'PostgreSQL', desc: 'SQL Database' },
+  { Icon: Database, label: 'Prisma', desc: 'ORM' },
+  { Icon: GitHubIcon, label: 'GitHub', desc: 'Version Control' },
+  { Icon: Terminal, label: 'CI/CD', desc: 'Automation Pipelines' },
+  { Icon: Server, label: 'Bun', desc: 'JS Runtime & Package Manager' },
+  { Icon: Code, label: 'Python', desc: 'Programming Language' },
+  { Icon: Code, label: 'Java', desc: 'Programming Language' },
+];
 
 const Skills = () => {
+  const [visible, setVisible] = useState([]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const triggerPoint = window.innerHeight * 0.85;
+      const cards = document.querySelectorAll('.skill-card');
+      cards.forEach((card, idx) => {
+        const top = card.getBoundingClientRect().top;
+        if (top < triggerPoint && !visible.includes(idx)) {
+          setVisible(prev => [...prev, idx]);
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // trigger on load
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [visible]);
+
   return (
-    <>
-      <section className="section" id='Skills'>
-        <div className="container">
-          <h2 className='headline-2'>
-            Tools I use
-          </h2>
-          <p className=' text-zinc-400 mt-3 mb-8 max-w-[50ch]'>
-            Here are some of the essential tools and technologies I rely on to bring ideas to life:
-          </p>
-          <div className=" grid gap-3 grid-cols-[repeat(auto-fill,_minmax(350px,_1fr))]">
-            {
-              skillItem.map(({ imgSrc,label,desc}, key) =>(
+    <section className="section" id="Skills">
+      <div className="container">
+        <h2 className="headline-2 mb-3">Top Skills & Tools</h2>
+        <p className="text-zinc-400 mb-8 max-w-[60ch]">
+          Modern technologies I rely on to craft scalable, maintainable, and high-performance web applications:
+        </p>
+
+        <div className="grid gap-6 grid-cols-[repeat(auto-fill,_minmax(280px,_1fr))]">
+          {skillItems.map(({ Icon, label, desc }, idx) => {
+            const isVisible = visible.includes(idx);
+            const animationStyle = {
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+              transition: `opacity 0.6s ease ${idx * 0.1}s, transform 0.6s ease ${idx * 0.1}s`
+            };
+            return (
+              <div key={idx} style={animationStyle} className="skill-card">
                 <SkillCard
-                key={key}
-                  imgSrc={imgSrc}
+                  Icon={Icon}
                   label={label}
                   desc={desc}
+                  classes="hover:scale-[1.05] hover:shadow-xl transition-transform duration-300 ease-in-out"
                 />
-              ))
-            }
-          </div>
+              </div>
+            );
+          })}
         </div>
-      </section>
-    </>
-  )
-}
+      </div>
+    </section>
+  );
+};
 
-export default Skills
+export default Skills;
